@@ -2,6 +2,7 @@ import json
 from typing import TypedDict
 
 from p2pstorage_core.helper_classes.SocketAddress import SocketAddress
+from p2pstorage_core.server import StreamConfiguration
 from p2pstorage_core.server.Package import PackageType
 
 
@@ -13,9 +14,6 @@ class HeaderDict(TypedDict):
 
 
 class Header:
-    ENCODING_FORMAT = 'utf-8'
-    MAX_SIZE = 64
-
     def __init__(self, size: int, package_type: PackageType, from_ip: SocketAddress, to_ip: SocketAddress):
         self.__size = size
         self.__package_type = package_type
@@ -34,7 +32,8 @@ class Header:
         })
 
     def encode(self):
-        return self.to_json().encode(Header.ENCODING_FORMAT).zfill(Header.MAX_SIZE)
+        return self.to_json().encode(StreamConfiguration.ENCODING_FORMAT)\
+            .zfill(StreamConfiguration.HEADER_SIZE)
 
     def __repr__(self):
         return f'Header(size={self.__size}, ' \
@@ -55,7 +54,7 @@ class Header:
 
     @classmethod
     def decode(cls, obj: bytes) -> 'Header':
-        json_str = obj.decode(Header.ENCODING_FORMAT)
+        json_str = obj.decode(StreamConfiguration.ENCODING_FORMAT)
 
         json_str = json_str[0: json_str.find('\0')]
 
