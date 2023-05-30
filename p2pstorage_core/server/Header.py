@@ -15,6 +15,7 @@ class HeaderDict(TypedDict):
 
 class Header:
     ENCODING_FORMAT = 'utf-8'
+    MAX_SIZE = 64
 
     def __init__(self, size: int, package_type: PackageType, from_ip: SocketAddress, to_ip: SocketAddress):
         self.__size = size
@@ -31,7 +32,7 @@ class Header:
         })
 
     def encode(self):
-        return self.to_json().encode(Header.ENCODING_FORMAT)
+        return self.to_json().encode(Header.ENCODING_FORMAT).zfill(Header.MAX_SIZE)
 
     def __repr__(self):
         return f'Header(size={self.__size}, ' \
@@ -50,9 +51,9 @@ class Header:
 
         return Header(size, package_type, from_ip, to_ip)
 
-    def load_package(self, server_socket: socket.socket) -> AbstractPackage:
+    def load_package(self, client_socket: socket.socket) -> AbstractPackage:
         if self.__size > 0:
-            data = server_socket.recv(self.__size)
+            data = client_socket.recv(self.__size)
 
         match self.__package_type:
             case PackageType.HOST_CONNECTED:
@@ -61,6 +62,8 @@ class Header:
     @classmethod
     def decode(cls, obj: bytes) -> 'Header':
         json_str = obj.decode(Header.ENCODING_FORMAT)
+
+        json_str = json_str[0: json_str.find('\0')]
 
         return cls.from_json(json_str)
 
