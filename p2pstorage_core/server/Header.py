@@ -1,9 +1,8 @@
 import json
-import socket
 from typing import TypedDict
 
 from p2pstorage_core.helper_classes.SocketAddress import SocketAddress
-from p2pstorage_core.server.Package import PackageType, AbstractPackage, HostConnectedPackage
+from p2pstorage_core.server.Package import PackageType
 
 
 class HeaderDict(TypedDict):
@@ -53,9 +52,6 @@ class Header:
         to_ip = header_dict['to_ip']
 
         return Header(size, package_type, from_ip, to_ip)
-
-    def load_package(self, client_socket: socket.socket) -> AbstractPackage:
-        data = client_socket.recv(self.__size)
 
     @classmethod
     def decode(cls, obj: bytes) -> 'Header':
