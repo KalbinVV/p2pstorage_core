@@ -7,15 +7,11 @@ from p2pstorage_core.server.Header import Header
 
 class PackageType(Enum):
     HOST_CONNECTED = 1,
-    HOST_DISCONNECTED = 2
+    HOST_DISCONNECTED = 2,
+    SUCCESSFUL_CONNECT_RESPONSE = 3
 
 
 @dataclass
 class AbstractPackage:
     header: Header
     data: bytes
-
-
-class HostConnectedPackage(AbstractPackage):
-    def __init__(self, header: Header):
-        super().__init__(header, b'')

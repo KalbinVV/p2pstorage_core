@@ -23,6 +23,9 @@ class Header:
         self.__from_ip = from_ip
         self.__to_ip = to_ip
 
+    def get_type(self) -> PackageType:
+        return self.__package_type
+
     def to_json(self) -> str:
         return json.dumps({
             'size': self.__size,
@@ -52,12 +55,7 @@ class Header:
         return Header(size, package_type, from_ip, to_ip)
 
     def load_package(self, client_socket: socket.socket) -> AbstractPackage:
-        if self.__size > 0:
-            data = client_socket.recv(self.__size)
-
-        match self.__package_type:
-            case PackageType.HOST_CONNECTED:
-                return HostConnectedPackage(self)
+        data = client_socket.recv(self.__size)
 
     @classmethod
     def decode(cls, obj: bytes) -> 'Header':
