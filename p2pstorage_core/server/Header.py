@@ -1,14 +1,15 @@
 import json
+import socket
 from typing import TypedDict
 
 from p2pstorage_core.helper_classes.SocketAddress import SocketAddress
 from p2pstorage_core.server import StreamConfiguration
-from p2pstorage_core.server.Package import PackageType
+from p2pstorage_core.server.Package import PackageType, Package
 
 
 class HeaderDict(TypedDict):
     size: int
-    type: PackageType
+    package_type: PackageType
     from_ip: SocketAddress
     to_ip: SocketAddress
 
@@ -26,9 +27,9 @@ class Header:
     def to_json(self) -> str:
         return json.dumps({
             'size': self.__size,
-            'package_type': self.__package_type,
-            'from_ip': self.__from_ip,
-            'to_ip': self.__to_ip
+            'package_type': self.__package_type.value,
+            'from_ip': tuple(self.__from_ip),
+            'to_ip': tuple(self.__to_ip)
         })
 
     def encode(self):
@@ -41,12 +42,17 @@ class Header:
                f'from_ip={self.__from_ip}, ' \
                f'to_ip={self.__to_ip})'
 
+    def load_package(self, client_socket: socket.socket) -> 'Package':
+        data = client_socket.recv(self.__size)
+
+        return Package(data)
+
     @staticmethod
     def from_json(json_str: str) -> 'Header':
         header_dict: HeaderDict = json.loads(json_str)
 
         size = header_dict['size']
-        package_type = header_dict['type']
+        package_type = header_dict['package_type']
         from_ip = header_dict['from_ip']
         to_ip = header_dict['to_ip']
 
@@ -56,7 +62,7 @@ class Header:
     def decode(cls, obj: bytes) -> 'Header':
         json_str = obj.decode(StreamConfiguration.ENCODING_FORMAT)
 
-        json_str = json_str[0: json_str.find('\0')]
+        json_str = json_str[json_str.find('{'):]
 
         return cls.from_json(json_str)
 
