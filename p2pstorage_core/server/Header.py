@@ -1,9 +1,11 @@
 import json
 import socket
-from typing import TypedDict
+from json import JSONDecodeError
+from typing import TypedDict, Optional
 
 from p2pstorage_core.helper_classes.SocketAddress import SocketAddress
 from p2pstorage_core.server import StreamConfiguration
+from p2pstorage_core.server.Exceptions import InvalidHeaderException
 from p2pstorage_core.server.Package import Package
 
 
@@ -41,7 +43,12 @@ class Header:
 
     @staticmethod
     def from_json(json_str: str) -> 'Header':
-        header_dict: HeaderDict = json.loads(json_str)
+        header_dict: Optional[HeaderDict] = None
+
+        try:
+            header_dict: HeaderDict = json.loads(json_str)
+        except JSONDecodeError:
+            raise InvalidHeaderException
 
         size = header_dict['size']
         from_ip = header_dict['from_ip']
