@@ -37,6 +37,9 @@ class Header:
     def send(self, host_socket: socket.socket) -> None:
         host_socket.send(self.encode())
 
+    def sendto(self, host_socket: socket.socket, addr: SocketAddress) -> None:
+        host_socket.sendto(self.encode())
+
     def __repr__(self) -> str:
         return f'Header(size={self.__size}, ' \
                f'from_ip={self.__from_ip}'
