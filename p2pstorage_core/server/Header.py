@@ -4,7 +4,7 @@ from typing import TypedDict
 
 from p2pstorage_core.helper_classes.SocketAddress import SocketAddress
 from p2pstorage_core.server import StreamConfiguration
-from p2pstorage_core.server.Package import PackageType, Package
+from p2pstorage_core.server.Package import Package
 
 
 class HeaderDict(TypedDict):
@@ -23,18 +23,21 @@ class Header:
             'from_ip': tuple(self.__from_ip)
         })
 
-    def encode(self):
+    def encode(self) -> bytes:
         return self.to_json().encode(StreamConfiguration.ENCODING_FORMAT)\
             .zfill(StreamConfiguration.HEADER_SIZE)
 
-    def __repr__(self):
-        return f'Header(size={self.__size}, ' \
-               f'from_ip={self.__from_ip}'
-
-    def load_package(self, client_socket: socket.socket) -> 'Package':
-        data = client_socket.recv(self.__size)
+    def load_package(self, host_socket: socket.socket) -> 'Package':
+        data = host_socket.recv(self.__size)
 
         return Package.decode(data)
+
+    def send(self, host_socket: socket.socket) -> None:
+        host_socket.send(self.encode())
+
+    def __repr__(self) -> str:
+        return f'Header(size={self.__size}, ' \
+               f'from_ip={self.__from_ip}'
 
     @staticmethod
     def from_json(json_str: str) -> 'Header':
