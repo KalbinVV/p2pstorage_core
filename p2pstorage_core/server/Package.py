@@ -1,7 +1,5 @@
-import json
 from enum import IntEnum
-
-from p2pstorage_core.server import StreamConfiguration
+import pickle
 
 
 class PackageType(IntEnum):
@@ -10,20 +8,24 @@ class PackageType(IntEnum):
 
 
 class Package:
-    def __init__(self, data: bytes):
+    def __init__(self, data: bytes, type_of_package: PackageType):
         self.__data = data
+        self.__type = type_of_package
 
-    def get_data(self):
+    def get_data(self) -> bytes:
         return self.__data
 
-    @staticmethod
-    def from_json(json_value: str) -> 'Package':
-        data = json_value.encode(StreamConfiguration.ENCODING_FORMAT)
-
-        return Package(data)
-
-    def to_json(self) -> str:
-        return self.__data.decode(StreamConfiguration.ENCODING_FORMAT)
+    def get_type(self) -> PackageType:
+        return self.__type
 
     def __repr__(self):
-        return f'Package(data={self.__data})'
+        return f'Package(data={self.__data}, type={self.__type})'
+
+    def encode(self):
+        return pickle.dumps(self)
+
+    @staticmethod
+    def decode(obj: bytes) -> 'Package':
+        package: 'Package' = pickle.loads(obj)
+
+        return package
