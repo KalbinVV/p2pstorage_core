@@ -9,7 +9,8 @@ from p2pstorage_core.server.Exceptions import EmptyHeaderException
 
 class PackageType(IntEnum):
     HOST_CONNECT_REQUEST = 1
-    HOST_CONNECT_RESPONSE = 2
+    HOST_CONNECT_RESPONSE = 2,
+    CONNECTION_LOST = 3
 
 
 class Package:
@@ -79,3 +80,8 @@ class ConnectionResponsePackage(Package):
 
     def get_reason(self) -> bool:
         return self.get_data()[1]
+
+
+class ConnectionLostPackage(Package):
+    def __init__(self, reason: str = ''):
+        super().__init__(reason, PackageType.CONNECTION_LOST)
