@@ -48,7 +48,7 @@ class Package:
         return f'Package(data={self.__data}, type={self.__type})'
 
     def __str__(self) -> str:
-        return f'(data={self.__data}, type={self.__type})'
+        return f'(data={self.__data}, type={self.__type.name})'
 
     @staticmethod
     def recv(host_socket: socket.socket):
