@@ -90,6 +90,10 @@ class ConnectionResponsePackage(Package):
             'reject_reason': reject_reason
         }, PackageType.HOST_CONNECT_RESPONSE)
 
+    @classmethod
+    def from_package(cls, package: Package) -> Self:
+        return cls(**package.get_data())
+
     def is_connection_approved(self) -> bool:
         return self.get_data()['connection_approved']
 
@@ -103,6 +107,10 @@ class ConnectionLostPackage(Package):
             'reason': reason
         }, PackageType.CONNECTION_LOST)
 
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
+
     def get_reason(self) -> str:
         return self.get_data()['reason']
 
@@ -113,6 +121,10 @@ class NewFileRequestPackage(Package):
             'file_name': file_name,
             'file_size': file_size
         }, PackageType.NEW_FILE_REQUEST)
+
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
 
     def get_file_name(self) -> str:
         return self.get_data()['file_name']
@@ -127,6 +139,10 @@ class NewFileResponsePackage(Package):
             'file_approved': file_approved,
             'reject_reason': reject_reason
         }, PackageType.HOST_CONNECT_RESPONSE)
+
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
 
     def is_file_approved(self) -> bool:
         return self.get_data()['file_approved']
