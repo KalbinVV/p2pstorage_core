@@ -28,7 +28,7 @@ class Package:
     def encode(self) -> bytes:
         return pickle.dumps(self)
 
-    def send(self, host_socket: socket.socket) -> 'Package':
+    def send(self, host_socket: socket.socket):
         from p2pstorage_core.server.Header import Header
 
         data_to_send = self.encode()
