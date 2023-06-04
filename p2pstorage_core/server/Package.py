@@ -9,8 +9,9 @@ from p2pstorage_core.server.Exceptions import EmptyHeaderException
 
 class PackageType(IntEnum):
     HOST_CONNECT_REQUEST = 1
-    HOST_CONNECT_RESPONSE = 2,
+    HOST_CONNECT_RESPONSE = 2
     CONNECTION_LOST = 3
+    NEW_FILE = 4
 
 
 class Package:
@@ -27,7 +28,7 @@ class Package:
     def encode(self) -> bytes:
         return pickle.dumps(self)
 
-    def send(self, host_socket: socket.socket) -> None:
+    def send(self, host_socket: socket.socket) -> 'Package':
         from p2pstorage_core.server.Header import Header
 
         data_to_send = self.encode()
@@ -40,6 +41,10 @@ class Package:
 
         header.send(host_socket)
         host_socket.send(data_to_send)
+
+        response = self.recv(host_socket)
+
+        return response
 
     def __repr__(self) -> str:
         return f'Package(data={self.__data}, type={self.__type})'
@@ -85,3 +90,17 @@ class ConnectionResponsePackage(Package):
 class ConnectionLostPackage(Package):
     def __init__(self, reason: str = ''):
         super().__init__(reason, PackageType.CONNECTION_LOST)
+
+
+class NewFilePackage(Package):
+    def __init__(self, file_name: str, file_size: int):
+        super().__init__({
+            'file_name': file_name,
+            'file_size': file_size
+        }, PackageType.NEW_FILE)
+
+    def get_file_name(self) -> str:
+        return self.get_data()['file_name']
+
+    def get_file_size(self) -> int:
+        return self.get_data()['file_size']
