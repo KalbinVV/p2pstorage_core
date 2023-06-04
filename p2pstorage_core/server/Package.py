@@ -80,7 +80,7 @@ class Package:
 
 class ConnectionRequestPackage(Package):
     def __init__(self):
-        super().__init__(None, PackageType.HOST_CONNECT_REQUEST)
+        super().__init__({}, PackageType.HOST_CONNECT_REQUEST)
 
 
 class ConnectionResponsePackage(Package):
@@ -99,7 +99,12 @@ class ConnectionResponsePackage(Package):
 
 class ConnectionLostPackage(Package):
     def __init__(self, reason: str = '!'):
-        super().__init__(reason, PackageType.CONNECTION_LOST)
+        super().__init__({
+            'reason': reason
+        }, PackageType.CONNECTION_LOST)
+
+    def get_reason(self) -> str:
+        return self.get_data()['reason']
 
 
 class NewFileRequestPackage(Package):
