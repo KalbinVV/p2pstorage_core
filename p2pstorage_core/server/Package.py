@@ -3,7 +3,6 @@ from enum import IntEnum
 import pickle
 from typing import Any
 
-from p2pstorage_core.helper_classes.SocketAddress import SocketAddress
 from p2pstorage_core.server import StreamConfiguration
 from p2pstorage_core.server.Exceptions import EmptyHeaderException
 

@@ -1,7 +1,7 @@
 import json
 import socket
 from json import JSONDecodeError
-from typing import TypedDict, Optional
+from typing import TypedDict
 
 from p2pstorage_core.helper_classes.SocketAddress import SocketAddress
 from p2pstorage_core.server import StreamConfiguration
@@ -43,8 +43,6 @@ class Header:
 
     @staticmethod
     def from_json(json_str: str) -> 'Header':
-        header_dict: Optional[HeaderDict] = None
-
         try:
             header_dict: HeaderDict = json.loads(json_str)
         except JSONDecodeError:
