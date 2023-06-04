@@ -42,20 +42,6 @@ class Package:
         header.send(host_socket)
         host_socket.send(data_to_send)
 
-    def sendto(self, host_socket: socket.socket, addr: SocketAddress):
-        from p2pstorage_core.server.Header import Header
-
-        data_to_send = self.encode()
-
-        size_of_data = len(data_to_send)
-
-        host_address = host_socket.getpeername()
-
-        header = Header(size_of_data, host_address)
-
-        header.sendto(host_socket, addr)
-        host_socket.sendto(data_to_send, addr)
-
     def __repr__(self) -> str:
         return f'Package(data={self.__data}, type={self.__type})'
 
