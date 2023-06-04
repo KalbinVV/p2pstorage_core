@@ -91,10 +91,10 @@ class ConnectionResponsePackage(Package):
         }, PackageType.HOST_CONNECT_RESPONSE)
 
     def is_connection_approved(self) -> bool:
-        return self.get_data()[0]
+        return self.get_data()['connection_approved']
 
     def get_reason(self) -> bool:
-        return self.get_data()[1]
+        return self.get_data()['reject_reason']
 
 
 class ConnectionLostPackage(Package):
