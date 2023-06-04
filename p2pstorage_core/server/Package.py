@@ -91,7 +91,7 @@ class ConnectionResponsePackage(Package):
         }, PackageType.HOST_CONNECT_RESPONSE)
 
     @classmethod
-    def from_package(cls, package: Package) -> Self:
+    def from_abstract(cls, package: Package) -> Self:
         return cls(**package.get_data())
 
     def is_connection_approved(self) -> bool:
