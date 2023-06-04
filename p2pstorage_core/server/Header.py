@@ -1,9 +1,9 @@
 import json
+import logging
 import socket
 from json import JSONDecodeError
 from typing import TypedDict
 
-from p2pstorage_core.helper_classes.SocketAddress import SocketAddress
 from p2pstorage_core.server import StreamConfiguration
 from p2pstorage_core.server.Exceptions import InvalidHeaderException
 from p2pstorage_core.server.Package import Package
@@ -11,18 +11,15 @@ from p2pstorage_core.server.Package import Package
 
 class HeaderDict(TypedDict):
     size: int
-    from_ip: SocketAddress
 
 
 class Header:
-    def __init__(self, size: int, from_ip: SocketAddress):
+    def __init__(self, size: int):
         self.__size = size
-        self.__from_ip = from_ip
 
     def to_json(self) -> str:
         return json.dumps({
-            'size': self.__size,
-            'from_ip': tuple(self.__from_ip)
+            'size': self.__size
         })
 
     def encode(self) -> bytes:
@@ -35,11 +32,12 @@ class Header:
         return Package.decode(data)
 
     def send(self, host_socket: socket.socket) -> None:
+        logging.debug(f'Sending header {self}...')
+
         host_socket.send(self.encode())
 
     def __repr__(self) -> str:
-        return f'Header(size={self.__size}, ' \
-               f'from_ip={self.__from_ip}'
+        return f'Header(size={self.__size}'
 
     @staticmethod
     def from_json(json_str: str) -> 'Header':
@@ -49,9 +47,8 @@ class Header:
             raise InvalidHeaderException
 
         size = header_dict['size']
-        from_ip = header_dict['from_ip']
 
-        return Header(size, from_ip)
+        return Header(size)
 
     @classmethod
     def decode(cls, obj: bytes) -> 'Header':

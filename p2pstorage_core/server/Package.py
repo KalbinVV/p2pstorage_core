@@ -1,3 +1,4 @@
+import logging
 import socket
 from enum import IntEnum
 import pickle
@@ -32,13 +33,13 @@ class Package:
     def send(self, host_socket: socket.socket):
         from p2pstorage_core.server.Header import Header
 
+        logging.debug(f'Sending package {self}...')
+
         data_to_send = self.encode()
 
         size_of_data = len(data_to_send)
 
-        host_address = host_socket.getpeername()
-
-        header = Header(size_of_data, host_address)
+        header = Header(size_of_data)
 
         header.send(host_socket)
         host_socket.send(data_to_send)
@@ -58,12 +59,18 @@ class Package:
 
         header_data = host_socket.recv(StreamConfiguration.HEADER_SIZE)
 
+        logging.debug(f'Receiving header data {header_data}...')
+
         if not header_data:
             raise EmptyHeaderException
 
         header = Header.decode(header_data)
 
+        logging.debug(f'Receive header {header}!')
+
         package = header.load_package(host_socket)
+
+        logging.debug(f'Receive package {package}!')
 
         return package
 
@@ -91,7 +98,7 @@ class ConnectionResponsePackage(Package):
 
 
 class ConnectionLostPackage(Package):
-    def __init__(self, reason: str = ''):
+    def __init__(self, reason: str = '!'):
         super().__init__(reason, PackageType.CONNECTION_LOST)
 
 
