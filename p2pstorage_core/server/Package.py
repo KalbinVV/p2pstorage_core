@@ -29,7 +29,6 @@ class Package:
     def encode(self) -> bytes:
         return pickle.dumps(self)
 
-    # Send package and get response, return value can be None, if response not exists.
     def send(self, host_socket: socket.socket):
         from p2pstorage_core.server.Header import Header
 
@@ -43,12 +42,6 @@ class Package:
 
         header.send(host_socket)
         host_socket.send(data_to_send)
-
-        # If not response was sent, example: connection lost
-        try:
-            return self.recv(host_socket)
-        except EmptyHeaderException:
-            return None
 
     def __repr__(self) -> str:
         return f'Package(data={self.__data}, type={self.__type})'
