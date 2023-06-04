@@ -39,6 +39,9 @@ class Header:
     def __repr__(self) -> str:
         return f'Header(size={self.__size}'
 
+    def __str__(self) -> str:
+        return self.to_json()
+
     @staticmethod
     def from_json(json_str: str) -> 'Header':
         try:

@@ -12,7 +12,8 @@ class PackageType(IntEnum):
     HOST_CONNECT_REQUEST = 1
     HOST_CONNECT_RESPONSE = 2
     CONNECTION_LOST = 3
-    NEW_FILE = 4
+    NEW_FILE_REQUEST = 4
+    NEW_FILE_RESPONSE = 5
 
 
 class Package:
@@ -45,6 +46,9 @@ class Package:
 
     def __repr__(self) -> str:
         return f'Package(data={self.__data}, type={self.__type})'
+
+    def __str__(self) -> str:
+        return f'(data={self.__data}, type={self.__type})'
 
     @staticmethod
     def recv(host_socket: socket.socket):
@@ -81,7 +85,10 @@ class ConnectionRequestPackage(Package):
 
 class ConnectionResponsePackage(Package):
     def __init__(self, connection_approved: bool = True, reject_reason: str = ''):
-        super().__init__((connection_approved, reject_reason), PackageType.HOST_CONNECT_RESPONSE)
+        super().__init__({
+            'connection_approved': connection_approved,
+            'reject_reason': reject_reason
+        }, PackageType.HOST_CONNECT_RESPONSE)
 
     def is_connection_approved(self) -> bool:
         return self.get_data()[0]
@@ -95,15 +102,29 @@ class ConnectionLostPackage(Package):
         super().__init__(reason, PackageType.CONNECTION_LOST)
 
 
-class NewFilePackage(Package):
+class NewFileRequestPackage(Package):
     def __init__(self, file_name: str, file_size: int):
         super().__init__({
             'file_name': file_name,
             'file_size': file_size
-        }, PackageType.NEW_FILE)
+        }, PackageType.NEW_FILE_REQUEST)
 
     def get_file_name(self) -> str:
         return self.get_data()['file_name']
 
     def get_file_size(self) -> int:
         return self.get_data()['file_size']
+
+
+class NewFileResponsePackage(Package):
+    def __init__(self, file_approved: bool = True, reject_reason: str = ''):
+        super().__init__({
+            'file_approved': file_approved,
+            'reject_reason': reject_reason
+        }, PackageType.HOST_CONNECT_RESPONSE)
+
+    def is_file_approved(self) -> bool:
+        return self.get_data()['file_approved']
+
+    def get_reason(self) -> str:
+        return self.get_data()['reject_reason']
