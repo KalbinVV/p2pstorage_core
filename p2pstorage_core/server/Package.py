@@ -30,7 +30,7 @@ class Package:
     def encode(self) -> bytes:
         return pickle.dumps(self)
 
-    def send(self, host_socket: socket.socket):
+    def send(self, host_socket: socket.socket) -> None:
         from p2pstorage_core.server.Header import Header
 
         logging.debug(f'Sending package {self}...')
@@ -51,7 +51,7 @@ class Package:
         return f'(data={self.__data}, type={self.__type.name})'
 
     @staticmethod
-    def recv(host_socket: socket.socket):
+    def recv(host_socket: socket.socket) -> 'Package':
         from p2pstorage_core.server.Header import Header
 
         header_data = host_socket.recv(StreamConfiguration.HEADER_SIZE)
@@ -72,7 +72,7 @@ class Package:
         return package
 
     @staticmethod
-    def decode(obj: bytes):
+    def decode(obj: bytes) -> 'Package':
         package: 'Package' = pickle.loads(obj)
 
         return package
