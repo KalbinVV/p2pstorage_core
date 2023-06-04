@@ -2,7 +2,7 @@ import json
 import logging
 import socket
 from json import JSONDecodeError
-from typing import TypedDict
+from typing import TypedDict, Self, Type
 
 from p2pstorage_core.server import StreamConfiguration
 from p2pstorage_core.server.Exceptions import InvalidHeaderException
@@ -26,7 +26,7 @@ class Header:
         return self.to_json().encode(StreamConfiguration.ENCODING_FORMAT)\
             .zfill(StreamConfiguration.HEADER_SIZE)
 
-    def load_package(self, host_socket: socket.socket) -> 'Package':
+    def load_package(self, host_socket: socket.socket) -> Type[Package]:
         data = host_socket.recv(self.__size)
 
         return Package.decode(data)
@@ -43,7 +43,7 @@ class Header:
         return self.to_json()
 
     @staticmethod
-    def from_json(json_str: str) -> 'Header':
+    def from_json(json_str: str) -> Self:
         try:
             header_dict: HeaderDict = json.loads(json_str)
         except JSONDecodeError:
@@ -54,7 +54,7 @@ class Header:
         return Header(size)
 
     @classmethod
-    def decode(cls, obj: bytes) -> 'Header':
+    def decode(cls, obj: bytes) -> Self:
         json_str = obj.decode(StreamConfiguration.ENCODING_FORMAT)
 
         json_str = json_str[json_str.find('{'):]

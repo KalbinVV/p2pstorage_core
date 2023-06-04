@@ -2,7 +2,7 @@ import logging
 import socket
 from enum import IntEnum
 import pickle
-from typing import Any
+from typing import Any, Type, Self
 
 from p2pstorage_core.server import StreamConfiguration
 from p2pstorage_core.server.Exceptions import EmptyHeaderException
@@ -51,7 +51,7 @@ class Package:
         return f'(data={self.__data}, type={self.__type.name})'
 
     @staticmethod
-    def recv(host_socket: socket.socket) -> 'Package':
+    def recv(host_socket: socket.socket) -> Type[Self]:
         from p2pstorage_core.server.Header import Header
 
         header_data = host_socket.recv(StreamConfiguration.HEADER_SIZE)
@@ -72,8 +72,8 @@ class Package:
         return package
 
     @staticmethod
-    def decode(obj: bytes) -> 'Package':
-        package: 'Package' = pickle.loads(obj)
+    def decode(obj: bytes) -> Type[Self]:
+        package: Self = pickle.loads(obj)
 
         return package
 
