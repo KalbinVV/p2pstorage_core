@@ -6,6 +6,7 @@ from typing import Any, Type, Self
 
 from p2pstorage_core.server import StreamConfiguration
 from p2pstorage_core.server.Exceptions import EmptyHeaderException
+from p2pstorage_core.server.Host import Host
 
 
 class PackageType(IntEnum):
@@ -14,6 +15,8 @@ class PackageType(IntEnum):
     CONNECTION_LOST = 3
     NEW_FILE_REQUEST = 4
     NEW_FILE_RESPONSE = 5
+    HOSTS_LIST_REQUEST = 6
+    HOSTS_LIST_RESPONSE = 7
 
 
 class Package:
@@ -154,6 +157,34 @@ class NewFileResponsePackage(Package):
 
     def get_reason(self) -> str:
         return self.get_data()['reject_reason']
+
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
+
+
+class HostsListRequestPackage(Package):
+    def __init__(self):
+        super().__init__({}, PackageType.HOSTS_LIST_REQUEST)
+
+
+class HostsListResponsePackage(Package):
+    def __init__(self, response_approved: bool, hosts_list: list[Host] | None = None,
+                 reject_reason: str = ''):
+        super().__init__({
+            'response_approved': response_approved,
+            'hosts_list': hosts_list,
+            'reject_reason': reject_reason
+        }, PackageType.HOST_CONNECT_RESPONSE)
+
+    def is_response_approved(self) -> bool:
+        return self.get_data()['response_approved']
+
+    def get_reject_reason(self) -> str:
+        return self.get_data()['reject_reason']
+
+    def get_hosts(self) -> list[Host] | None:
+        return self.get_data()['hosts_list']
 
     @classmethod
     def from_abstract(cls, package: Package) -> Self:
