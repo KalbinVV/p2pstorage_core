@@ -6,7 +6,7 @@ from typing import Any, Type, Self
 
 from p2pstorage_core.server import StreamConfiguration
 from p2pstorage_core.server.Exceptions import EmptyHeaderException
-from p2pstorage_core.server.Host import Host
+from p2pstorage_core.server.Host import HostInfo
 
 
 class PackageType(IntEnum):
@@ -169,7 +169,7 @@ class HostsListRequestPackage(Package):
 
 
 class HostsListResponsePackage(Package):
-    def __init__(self, response_approved: bool, hosts_list: list[Host] | None = None,
+    def __init__(self, response_approved: bool, hosts_list: list[HostInfo] | None = None,
                  reject_reason: str = ''):
         super().__init__({
             'response_approved': response_approved,
@@ -183,7 +183,7 @@ class HostsListResponsePackage(Package):
     def get_reject_reason(self) -> str:
         return self.get_data()['reject_reason']
 
-    def get_hosts(self) -> list[Host] | None:
+    def get_hosts(self) -> list[HostInfo] | None:
         return self.get_data()['hosts_list']
 
     @classmethod
