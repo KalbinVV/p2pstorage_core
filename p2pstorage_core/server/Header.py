@@ -5,21 +5,25 @@ from json import JSONDecodeError
 from typing import TypedDict, Self, Type
 
 from p2pstorage_core.server import StreamConfiguration
+from p2pstorage_core.server.Crypt import CryptMode
 from p2pstorage_core.server.Exceptions import InvalidHeaderException
 from p2pstorage_core.server.Package import Package
 
 
 class HeaderDict(TypedDict):
     size: int
+    crypt_mode: CryptMode
 
 
 class Header:
-    def __init__(self, size: int):
+    def __init__(self, size: int, crypt_mode: CryptMode = CryptMode.UNENCRYPTED):
         self.__size = size
+        self.__crypt_mode = crypt_mode
 
     def to_json(self) -> str:
         return json.dumps({
-            'size': self.__size
+            'size': self.__size,
+            'crypt_mode': self.__crypt_mode
         })
 
     def encode(self) -> bytes:
@@ -37,7 +41,7 @@ class Header:
         host_socket.send(self.encode())
 
     def __repr__(self) -> str:
-        return f'Header(size={self.__size}'
+        return f'Header(size={self.__size}, crypt_mode={self.__size})'
 
     def __str__(self) -> str:
         return self.to_json()
@@ -50,8 +54,9 @@ class Header:
             raise InvalidHeaderException
 
         size = header_dict['size']
+        crypt_mode = header_dict['crypt_mode']
 
-        return Header(size)
+        return Header(size, crypt_mode)
 
     @classmethod
     def decode(cls, obj: bytes) -> Self:

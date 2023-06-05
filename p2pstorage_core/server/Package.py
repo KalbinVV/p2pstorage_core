@@ -79,8 +79,17 @@ class Package:
 
 
 class ConnectionRequestPackage(Package):
-    def __init__(self):
-        super().__init__({}, PackageType.HOST_CONNECT_REQUEST)
+    def __init__(self, host_name: str):
+        super().__init__({
+            'host_name': host_name
+        }, PackageType.HOST_CONNECT_REQUEST)
+
+    def get_host_name(self) -> str:
+        return self.get_data()['host_name']
+
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
 
 
 class ConnectionResponsePackage(Package):
@@ -90,15 +99,15 @@ class ConnectionResponsePackage(Package):
             'reject_reason': reject_reason
         }, PackageType.HOST_CONNECT_RESPONSE)
 
-    @classmethod
-    def from_abstract(cls, package: Package) -> Self:
-        return cls(**package.get_data())
-
     def is_connection_approved(self) -> bool:
         return self.get_data()['connection_approved']
 
     def get_reason(self) -> bool:
         return self.get_data()['reject_reason']
+
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
 
 
 class ConnectionLostPackage(Package):
@@ -107,12 +116,12 @@ class ConnectionLostPackage(Package):
             'reason': reason
         }, PackageType.CONNECTION_LOST)
 
+    def get_reason(self) -> str:
+        return self.get_data()['reason']
+
     @classmethod
     def from_abstract(cls, package: Package) -> Self:
         return cls(**package.get_data())
-
-    def get_reason(self) -> str:
-        return self.get_data()['reason']
 
 
 class NewFileRequestPackage(Package):
@@ -122,15 +131,15 @@ class NewFileRequestPackage(Package):
             'file_size': file_size
         }, PackageType.NEW_FILE_REQUEST)
 
-    @classmethod
-    def from_abstract(cls, package: Package) -> Self:
-        return cls(**package.get_data())
-
     def get_file_name(self) -> str:
         return self.get_data()['file_name']
 
     def get_file_size(self) -> int:
         return self.get_data()['file_size']
+
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
 
 
 class NewFileResponsePackage(Package):
@@ -140,12 +149,12 @@ class NewFileResponsePackage(Package):
             'reject_reason': reject_reason
         }, PackageType.HOST_CONNECT_RESPONSE)
 
-    @classmethod
-    def from_abstract(cls, package: Package) -> Self:
-        return cls(**package.get_data())
-
     def is_file_approved(self) -> bool:
         return self.get_data()['file_approved']
 
     def get_reason(self) -> str:
         return self.get_data()['reject_reason']
+
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
