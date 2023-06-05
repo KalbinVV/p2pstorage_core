@@ -6,6 +6,7 @@ from typing import Any, Type, Self
 
 from p2pstorage_core.server import StreamConfiguration
 from p2pstorage_core.server.Exceptions import EmptyHeaderException
+from p2pstorage_core.server.FileInfo import FileInfo
 from p2pstorage_core.server.Host import HostInfo
 
 
@@ -128,17 +129,13 @@ class ConnectionLostPackage(Package):
 
 
 class NewFileRequestPackage(Package):
-    def __init__(self, file_name: str, file_size: int):
+    def __init__(self, file_info: FileInfo):
         super().__init__({
-            'file_name': file_name,
-            'file_size': file_size
+            'file_info': file_info
         }, PackageType.NEW_FILE_REQUEST)
 
-    def get_file_name(self) -> str:
-        return self.get_data()['file_name']
-
-    def get_file_size(self) -> int:
-        return self.get_data()['file_size']
+    def get_file_info(self) -> FileInfo:
+        return self.get_data()['file_info']
 
     @classmethod
     def from_abstract(cls, package: Package) -> Self:
