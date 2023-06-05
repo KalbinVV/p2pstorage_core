@@ -8,4 +8,4 @@ class Host:
     host_socket: socket.socket
 
     def __repr__(self):
-        return f'Host(host_name={self.host_name})'
+        return f'Host(host_name={self.host_name}, addr={self.host_socket.getpeername()})'
