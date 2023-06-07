@@ -6,7 +6,7 @@ from typing import Any, Type, Self
 
 from p2pstorage_core.server import StreamConfiguration
 from p2pstorage_core.server.Exceptions import EmptyHeaderException
-from p2pstorage_core.server.FileInfo import FileInfo
+from p2pstorage_core.server.FileInfo import FileInfo, FileDataBaseInfo
 from p2pstorage_core.server.Host import HostInfo
 
 
@@ -18,6 +18,8 @@ class PackageType(IntEnum):
     NEW_FILE_RESPONSE = 5
     HOSTS_LIST_REQUEST = 6
     HOSTS_LIST_RESPONSE = 7
+    FILES_LIST_REQUEST = 8
+    FILES_LIST_RESPONSE = 9
 
 
 class Package:
@@ -187,6 +189,34 @@ class HostsListResponsePackage(Package):
 
     def get_hosts(self) -> list[HostInfo] | None:
         return self.get_data()['hosts_list']
+
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
+
+
+class FilesListRequestPackage(Package):
+    def __init__(self):
+        super().__init__({}, PackageType.FILES_LIST_REQUEST)
+
+
+class FilesListResponsePackage(Package):
+    def __init__(self, response_approved: bool, files_list: list[FileDataBaseInfo] | None = None,
+                 reject_reason: str = ''):
+        super().__init__({
+            'response_approved': response_approved,
+            'files_list': files_list,
+            'reject_reason': reject_reason
+        }, PackageType.FILES_LIST_RESPONSE)
+
+    def is_response_approved(self) -> bool:
+        return self.get_data()['response_approved']
+
+    def get_reject_reason(self) -> str:
+        return self.get_data()['reject_reason']
+
+    def get_files(self) -> list[FileDataBaseInfo] | None:
+        return self.get_data()['files_list']
 
     @classmethod
     def from_abstract(cls, package: Package) -> Self:
