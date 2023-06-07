@@ -152,7 +152,7 @@ class NewFileResponsePackage(Package):
         super().__init__({
             'file_approved': file_approved,
             'reject_reason': reject_reason
-        }, PackageType.HOST_CONNECT_RESPONSE)
+        }, PackageType.NEW_FILE_RESPONSE)
 
     def is_file_approved(self) -> bool:
         return self.get_data()['file_approved']
