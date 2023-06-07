@@ -97,9 +97,11 @@ class ConnectionRequestPackage(Package):
 
 
 class ConnectionResponsePackage(Package):
-    def __init__(self, connection_approved: bool = True, reject_reason: str = ''):
+    def __init__(self, connection_approved: bool = True, broadcast_message: str = '',
+                 reject_reason: str = ''):
         super().__init__({
             'connection_approved': connection_approved,
+            'broadcast_message': broadcast_message,
             'reject_reason': reject_reason
         }, PackageType.HOST_CONNECT_RESPONSE)
 
@@ -108,6 +110,9 @@ class ConnectionResponsePackage(Package):
 
     def get_reason(self) -> bool:
         return self.get_data()['reject_reason']
+
+    def get_broadcast_message(self) -> str:
+        return self.get_data()['broadcast_message']
 
     @classmethod
     def from_abstract(cls, package: Package) -> Self:
