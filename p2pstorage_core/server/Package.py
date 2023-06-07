@@ -4,6 +4,7 @@ from enum import IntEnum
 import pickle
 from typing import Any, Type, Self
 
+from p2pstorage_core.helper_classes.SocketAddress import SocketAddress
 from p2pstorage_core.server import StreamConfiguration
 from p2pstorage_core.server.Exceptions import EmptyHeaderException
 from p2pstorage_core.server.FileInfo import FileInfo, FileDataBaseInfo
@@ -20,6 +21,12 @@ class PackageType(IntEnum):
     HOSTS_LIST_RESPONSE = 7
     FILES_LIST_REQUEST = 8
     FILES_LIST_RESPONSE = 9
+    GET_FILE_BY_ID_REQUEST = 10
+    FILE_CONTAINS_REQUEST = 11
+    FILE_CONTAINS_RESPONSE = 12
+    FILE_TRANSACTION_START_REQUEST = 13
+    FILE_TRANSACTION_START_RESPONSE = 14
+    FILE_TRANSACTION_END_REQUEST = 15
 
 
 class Package:
@@ -217,6 +224,85 @@ class FilesListResponsePackage(Package):
 
     def get_files(self) -> list[FileDataBaseInfo] | None:
         return self.get_data()['files_list']
+
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
+
+
+class GetFileByIdRequestPackage(Package):
+    def __init__(self, file_id):
+        super().__init__({
+            'file_id': file_id
+        }, PackageType.GET_FILE_BY_ID_REQUEST)
+
+    def get_file_id(self) -> int:
+        return self.get_data()['file_id']
+
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
+
+
+class FileTransactionStartRequestPackage(Package):
+    def __init__(self, file_path: str):
+        super().__init__({
+            'file_path': file_path
+        }, PackageType.FILE_TRANSACTION_START_REQUEST)
+
+    def get_file_path(self) -> str:
+        return self.get_data()['file_path']
+
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
+
+
+class FileTransactionStartResponsePackage(Package):
+    def __init__(self, sender_addr: SocketAddress | None, transaction_started: bool = True,
+                 reject_reason: str = ''):
+        super().__init__({
+            'sender_addr': sender_addr,
+            'transaction_started': transaction_started,
+            'reject_reason': reject_reason
+        }, PackageType.FILE_TRANSACTION_START_RESPONSE)
+
+    def get_sender_addr(self) -> SocketAddress:
+        return self.get_data()['sender_addr']
+
+    def is_transaction_started(self) -> bool:
+        return self.get_data()['transaction_started']
+
+    def get_reject_reason(self) -> str:
+        return self.get_data()['reject_reason']
+
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
+
+
+class FileContainsRequestPackage(Package):
+    def __init__(self, file_path: str):
+        super().__init__({
+            'file_path': file_path
+        }, PackageType.FILE_CONTAINS_REQUEST)
+
+    def get_file_path(self) -> bool:
+        return self.get_data()['file_path']
+
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
+
+
+class FileContainsResponsePackage(Package):
+    def __init__(self, file_contains: bool = True):
+        super().__init__({
+            'file_contains': file_contains
+        }, PackageType.FILE_CONTAINS_RESPONSE)
+
+    def is_file_contains(self) -> bool:
+        return self.get_data()['file_contains']
 
     @classmethod
     def from_abstract(cls, package: Package) -> Self:
