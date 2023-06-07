@@ -6,3 +6,4 @@ class FileInfo:
     name: str
     size: int
     hash: str
+    id: int = -1
