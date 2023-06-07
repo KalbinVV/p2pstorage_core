@@ -173,7 +173,7 @@ class HostsListRequestPackage(Package):
 
 
 class HostsListResponsePackage(Package):
-    def __init__(self, response_approved: bool, hosts_list: list[HostInfo] | None = None,
+    def __init__(self, response_approved: bool = True, hosts_list: list[HostInfo] | None = None,
                  reject_reason: str = ''):
         super().__init__({
             'response_approved': response_approved,
@@ -201,7 +201,7 @@ class FilesListRequestPackage(Package):
 
 
 class FilesListResponsePackage(Package):
-    def __init__(self, response_approved: bool, files_list: list[FileDataBaseInfo] | None = None,
+    def __init__(self, response_approved: bool = True, files_list: list[FileDataBaseInfo] | None = None,
                  reject_reason: str = ''):
         super().__init__({
             'response_approved': response_approved,
