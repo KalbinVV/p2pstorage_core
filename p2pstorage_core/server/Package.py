@@ -143,13 +143,13 @@ class ConnectionLostPackage(Package):
 
 
 class NewFileRequestPackage(Package):
-    def __init__(self, file_info: FileInfo):
+    def __init__(self, files_info: list[FileInfo]):
         super().__init__({
-            'file_info': file_info
+            'files_info': files_info
         }, PackageType.NEW_FILE_REQUEST)
 
-    def get_file_info(self) -> FileInfo:
-        return self.get_data()['file_info']
+    def get_files_info(self) -> list[FileInfo]:
+        return self.get_data()['files_info']
 
     @classmethod
     def from_abstract(cls, package: Package) -> Self:
@@ -245,13 +245,13 @@ class GetFileByIdRequestPackage(Package):
 
 
 class FileTransactionStartRequestPackage(Package):
-    def __init__(self, file_path: str):
+    def __init__(self, file_name: str):
         super().__init__({
-            'file_path': file_path
+            'file_name': file_name
         }, PackageType.FILE_TRANSACTION_START_REQUEST)
 
-    def get_file_path(self) -> str:
-        return self.get_data()['file_path']
+    def get_file_name(self) -> str:
+        return self.get_data()['file_name']
 
     @classmethod
     def from_abstract(cls, package: Package) -> Self:
@@ -259,16 +259,22 @@ class FileTransactionStartRequestPackage(Package):
 
 
 class FileTransactionStartResponsePackage(Package):
-    def __init__(self, sender_addr: SocketAddress | None, transaction_started: bool = True,
+    def __init__(self, sender_addr: SocketAddress | None,
+                 file_name: str = '',
+                 transaction_started: bool = True,
                  reject_reason: str = ''):
         super().__init__({
             'sender_addr': sender_addr,
+            'file_name': file_name,
             'transaction_started': transaction_started,
             'reject_reason': reject_reason
         }, PackageType.FILE_TRANSACTION_START_RESPONSE)
 
     def get_sender_addr(self) -> SocketAddress:
         return self.get_data()['sender_addr']
+
+    def get_file_name(self) -> str:
+        return self.get_data()['file_name']
 
     def is_transaction_started(self) -> bool:
         return self.get_data()['transaction_started']
@@ -282,13 +288,13 @@ class FileTransactionStartResponsePackage(Package):
 
 
 class FileContainsRequestPackage(Package):
-    def __init__(self, file_path: str):
+    def __init__(self, file_name: str):
         super().__init__({
-            'file_path': file_path
+            'file_name': file_name
         }, PackageType.FILE_CONTAINS_REQUEST)
 
-    def get_file_path(self) -> bool:
-        return self.get_data()['file_path']
+    def get_file_name(self) -> bool:
+        return self.get_data()['file_name']
 
     @classmethod
     def from_abstract(cls, package: Package) -> Self:

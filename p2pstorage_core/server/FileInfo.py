@@ -17,4 +17,4 @@ class FileDataBaseInfo:
     hash: str
 
     def __init__(self, tpl: tuple[int, int, str, int, str]):
-        self.id, self.host_id, self.name, self.path, self.hash = tpl
+        self.id, self.host_id, self.name, self.size, self.hash = tpl
