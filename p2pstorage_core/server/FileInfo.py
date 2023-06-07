@@ -6,4 +6,12 @@ class FileInfo:
     name: str
     size: int
     hash: str
-    id: int = -1
+
+
+@dataclass(frozen=True)
+class FileDataBaseInfo:
+    id: int
+    host_id: int
+    name: str
+    size: int
+    hash: str
