@@ -8,10 +8,13 @@ class FileInfo:
     hash: str
 
 
-@dataclass(frozen=True)
+@dataclass
 class FileDataBaseInfo:
     id: int
     host_id: int
     name: str
     size: int
     hash: str
+
+    def __init__(self, tpl: tuple[int, int, str, int, str]):
+        self.id, self.host_id, self.name, self.size, self.hash = tpl
