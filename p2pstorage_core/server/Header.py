@@ -36,7 +36,7 @@ class Header:
         return Package.decode(data)
 
     def send(self, host_socket: socket.socket) -> None:
-        logging.debug(f'Sending header {self}...')
+        logging.debug(f'Sending header to {host_socket.getpeername()} {self}...')
 
         host_socket.send(self.encode())
 

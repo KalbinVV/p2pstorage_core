@@ -46,7 +46,7 @@ class Package:
     def send(self, host_socket: socket.socket) -> None:
         from p2pstorage_core.server.Header import Header
 
-        logging.debug(f'Sending package {self}...')
+        logging.debug(f'Sending package to {host_socket.getpeername()}: {self}...')
 
         data_to_send = self.encode()
 
@@ -69,18 +69,18 @@ class Package:
 
         header_data = host_socket.recv(StreamConfiguration.HEADER_SIZE)
 
-        logging.debug(f'Receiving header data {header_data}...')
+        logging.debug(f'Receiving header data from {host_socket.getpeername()}: {header_data}...')
 
         if not header_data:
             raise EmptyHeaderException
 
         header = Header.decode(header_data)
 
-        logging.debug(f'Receive header {header}!')
+        logging.debug(f'Receive header from {host_socket.getpeername()}: {header}!')
 
         package = header.load_package(host_socket)
 
-        logging.debug(f'Receive package {package}!')
+        logging.debug(f'Receive package from {host_socket.getpeername()}: {package}!')
 
         return package
 
@@ -245,13 +245,17 @@ class GetFileByIdRequestPackage(Package):
 
 
 class FileTransactionStartRequestPackage(Package):
-    def __init__(self, file_name: str):
+    def __init__(self, file_name: str, establish_addr: SocketAddress):
         super().__init__({
-            'file_name': file_name
+            'file_name': file_name,
+            'establish_addr': establish_addr
         }, PackageType.FILE_TRANSACTION_START_REQUEST)
 
     def get_file_name(self) -> str:
         return self.get_data()['file_name']
+
+    def get_establish_addr(self) -> SocketAddress:
+        return self.get_data()['establish_addr']
 
     @classmethod
     def from_abstract(cls, package: Package) -> Self:
