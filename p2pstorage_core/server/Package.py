@@ -27,6 +27,7 @@ class PackageType(IntEnum):
     FILE_TRANSACTION_START_REQUEST = 13
     FILE_TRANSACTION_START_RESPONSE = 14
     FILE_TRANSACTION_END_REQUEST = 15
+    NEW_HOST_CONNECTED = 16
 
 
 class Package:
@@ -313,6 +314,24 @@ class FileContainsResponsePackage(Package):
 
     def is_file_contains(self) -> bool:
         return self.get_data()['file_contains']
+
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
+
+
+class NewHostConnectedPackage(Package):
+    def __init__(self, host_addr: SocketAddress, host_name: str):
+        super().__init__({
+            'host_addr': host_addr,
+            'host_name': host_name
+        }, PackageType.NEW_HOST_CONNECTED)
+
+    def get_host_addr(self) -> SocketAddress:
+        return self.get_data()['host_addr']
+
+    def get_host_name(self) -> str:
+        return self.get_data()['host_name']
 
     @classmethod
     def from_abstract(cls, package: Package) -> Self:
