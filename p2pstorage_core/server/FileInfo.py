@@ -18,3 +18,6 @@ class FileDataBaseInfo:
 
     def __init__(self, tpl: tuple[int, int, str, int, str]):
         self.id, self.host_id, self.name, self.size, self.hash = tpl
+
+    def __str__(self) -> str:
+        return f'(id={self.id}, name={self.name})'
