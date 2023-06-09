@@ -1,5 +1,6 @@
 import logging
 import socket
+import threading
 from enum import IntEnum
 import pickle
 from typing import Any, Type, Self
@@ -28,6 +29,10 @@ class PackageType(IntEnum):
     FILE_TRANSACTION_START_RESPONSE = 14
     FILE_TRANSACTION_END_REQUEST = 15
     NEW_HOST_CONNECTED = 16
+    TRANSACTION_FINISHED = 17
+
+
+PACKAGE_SYNC_LOCK = threading.Lock()
 
 
 class Package:
@@ -66,24 +71,26 @@ class Package:
 
     @staticmethod
     def recv(host_socket: socket.socket) -> Type[Self]:
-        from p2pstorage_core.server.Header import Header
+        # Make operation sync
+        while PACKAGE_SYNC_LOCK:
+            from p2pstorage_core.server.Header import Header
 
-        header_data = host_socket.recv(StreamConfiguration.HEADER_SIZE)
+            header_data = host_socket.recv(StreamConfiguration.HEADER_SIZE)
 
-        logging.debug(f'Receiving header data from {host_socket.getpeername()}: {header_data}...')
+            logging.debug(f'Receiving header data from {host_socket.getpeername()}: {header_data}...')
 
-        if not header_data:
-            raise EmptyHeaderException
+            if not header_data:
+                raise EmptyHeaderException
 
-        header = Header.decode(header_data)
+            header = Header.decode(header_data)
 
-        logging.debug(f'Receive header from {host_socket.getpeername()}: {header}!')
+            logging.debug(f'Receive header from {host_socket.getpeername()}: {header}!')
 
-        package = header.load_package(host_socket)
+            package = header.load_package(host_socket)
 
-        logging.debug(f'Receive package from {host_socket.getpeername()}: {package}!')
+            logging.debug(f'Receive package from {host_socket.getpeername()}: {package}!')
 
-        return package
+            return package
 
     @staticmethod
     def decode(obj: bytes) -> Type[Self]:
@@ -336,6 +343,20 @@ class NewHostConnectedPackage(Package):
 
     def get_host_name(self) -> str:
         return self.get_data()['host_name']
+
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
+
+
+class FileTransactionFinishedPackage(Package):
+    def __init__(self, sender_addr: SocketAddress):
+        super().__init__({
+            'sender_addr': sender_addr
+        }, PackageType.TRANSACTION_FINISHED)
+
+    def get_sender_addr(self) -> SocketAddress:
+        return self.get_data()['sender_addr']
 
     @classmethod
     def from_abstract(cls, package: Package) -> Self:
