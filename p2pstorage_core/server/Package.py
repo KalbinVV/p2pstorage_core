@@ -158,10 +158,11 @@ class NewFileRequestPackage(Package):
 
 
 class NewFileResponsePackage(Package):
-    def __init__(self, file_approved: bool = True, reject_reason: str = ''):
+    def __init__(self, file_name: str = '', file_approved: bool = True, reject_reason: str = ''):
         super().__init__({
+            'file_name': file_name,
             'file_approved': file_approved,
-            'reject_reason': reject_reason
+            'reject_reason': reject_reason,
         }, PackageType.NEW_FILE_RESPONSE)
 
     def is_file_approved(self) -> bool:
@@ -169,6 +170,9 @@ class NewFileResponsePackage(Package):
 
     def get_reason(self) -> str:
         return self.get_data()['reject_reason']
+
+    def get_file_name(self) -> str:
+        return self.get_data()['file_name']
 
     @classmethod
     def from_abstract(cls, package: Package) -> Self:
