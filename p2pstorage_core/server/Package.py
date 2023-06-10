@@ -3,7 +3,7 @@ import socket
 import threading
 from enum import IntEnum
 import pickle
-from typing import Any, Type, Self
+from typing import Any, Type, Self, Optional
 
 from p2pstorage_core.helper_classes.SocketAddress import SocketAddress
 from p2pstorage_core.server import StreamConfiguration
@@ -270,11 +270,13 @@ class FileTransactionStartRequestPackage(Package):
 
 
 class FileTransactionStartResponsePackage(Package):
-    def __init__(self, sender_addr: SocketAddress | None,
+    def __init__(self, receiver_addr: Optional[SocketAddress],
+                 sender_addr: Optional[SocketAddress],
                  file_name: str = '',
                  transaction_started: bool = True,
                  reject_reason: str = ''):
         super().__init__({
+            'receiver_addr': receiver_addr,
             'sender_addr': sender_addr,
             'file_name': file_name,
             'transaction_started': transaction_started,
@@ -283,6 +285,9 @@ class FileTransactionStartResponsePackage(Package):
 
     def get_sender_addr(self) -> SocketAddress:
         return self.get_data()['sender_addr']
+
+    def get_receiver_addr(self) -> SocketAddress:
+        return self.get_data()['receiver_addr']
 
     def get_file_name(self) -> str:
         return self.get_data()['file_name']
