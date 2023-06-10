@@ -32,9 +32,6 @@ class PackageType(IntEnum):
     TRANSACTION_FINISHED = 17
 
 
-PACKAGE_SYNC_LOCK = threading.Lock()
-
-
 class Package:
     def __init__(self, data: Any, type_of_package: PackageType):
         self.__data = data
@@ -71,26 +68,24 @@ class Package:
 
     @staticmethod
     def recv(host_socket: socket.socket) -> Type[Self]:
-        # Make operation sync
-        with PACKAGE_SYNC_LOCK:
-            from p2pstorage_core.server.Header import Header
+        from p2pstorage_core.server.Header import Header
 
-            header_data = host_socket.recv(StreamConfiguration.HEADER_SIZE)
+        header_data = host_socket.recv(StreamConfiguration.HEADER_SIZE)
 
-            logging.debug(f'Receiving header data from {host_socket.getpeername()}: {header_data}...')
+        logging.debug(f'Receiving header data from {host_socket.getpeername()}: {header_data}...')
 
-            if not header_data:
-                raise EmptyHeaderException
+        if not header_data:
+            raise EmptyHeaderException
 
-            header = Header.decode(header_data)
+        header = Header.decode(header_data)
 
-            logging.debug(f'Receive header from {host_socket.getpeername()}: {header}!')
+        logging.debug(f'Receive header from {host_socket.getpeername()}: {header}!')
 
-            package = header.load_package(host_socket)
+        package = header.load_package(host_socket)
 
-            logging.debug(f'Receive package from {host_socket.getpeername()}: {package}!')
+        logging.debug(f'Receive package from {host_socket.getpeername()}: {package}!')
 
-            return package
+        return package
 
     @staticmethod
     def decode(obj: bytes) -> Type[Self]:
