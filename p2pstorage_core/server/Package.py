@@ -252,10 +252,11 @@ class GetFileByIdRequestPackage(Package):
 
 
 class FileTransactionStartRequestPackage(Package):
-    def __init__(self, file_name: str, establish_addr: SocketAddress):
+    def __init__(self, file_name: str, establish_addr: SocketAddress, receiver_addr: SocketAddress):
         super().__init__({
             'file_name': file_name,
-            'establish_addr': establish_addr
+            'establish_addr': establish_addr,
+            'receiver_addr': receiver_addr
         }, PackageType.FILE_TRANSACTION_START_REQUEST)
 
     def get_file_name(self) -> str:
@@ -263,6 +264,9 @@ class FileTransactionStartRequestPackage(Package):
 
     def get_establish_addr(self) -> SocketAddress:
         return self.get_data()['establish_addr']
+
+    def get_receiver_addr(self) -> SocketAddress:
+        return self.get_data()['receiver_addr']
 
     @classmethod
     def from_abstract(cls, package: Package) -> Self:
