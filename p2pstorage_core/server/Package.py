@@ -3,7 +3,7 @@ import socket
 import threading
 from enum import IntEnum
 import pickle
-from typing import Any, Type, Self
+from typing import Any, Type, Self, Optional
 
 from p2pstorage_core.helper_classes.SocketAddress import SocketAddress
 from p2pstorage_core.server import StreamConfiguration
@@ -252,10 +252,11 @@ class GetFileByIdRequestPackage(Package):
 
 
 class FileTransactionStartRequestPackage(Package):
-    def __init__(self, file_name: str, establish_addr: SocketAddress):
+    def __init__(self, file_name: str, establish_addr: SocketAddress, receiver_addr: SocketAddress):
         super().__init__({
             'file_name': file_name,
-            'establish_addr': establish_addr
+            'establish_addr': establish_addr,
+            'receiver_addr': receiver_addr
         }, PackageType.FILE_TRANSACTION_START_REQUEST)
 
     def get_file_name(self) -> str:
@@ -264,17 +265,22 @@ class FileTransactionStartRequestPackage(Package):
     def get_establish_addr(self) -> SocketAddress:
         return self.get_data()['establish_addr']
 
+    def get_receiver_addr(self) -> SocketAddress:
+        return self.get_data()['receiver_addr']
+
     @classmethod
     def from_abstract(cls, package: Package) -> Self:
         return cls(**package.get_data())
 
 
 class FileTransactionStartResponsePackage(Package):
-    def __init__(self, sender_addr: SocketAddress | None,
+    def __init__(self, receiver_addr: Optional[SocketAddress],
+                 sender_addr: Optional[SocketAddress],
                  file_name: str = '',
                  transaction_started: bool = True,
                  reject_reason: str = ''):
         super().__init__({
+            'receiver_addr': receiver_addr,
             'sender_addr': sender_addr,
             'file_name': file_name,
             'transaction_started': transaction_started,
@@ -283,6 +289,9 @@ class FileTransactionStartResponsePackage(Package):
 
     def get_sender_addr(self) -> SocketAddress:
         return self.get_data()['sender_addr']
+
+    def get_receiver_addr(self) -> SocketAddress:
+        return self.get_data()['receiver_addr']
 
     def get_file_name(self) -> str:
         return self.get_data()['file_name']
