@@ -72,7 +72,7 @@ class Package:
     @staticmethod
     def recv(host_socket: socket.socket) -> Type[Self]:
         # Make operation sync
-        while PACKAGE_SYNC_LOCK:
+        with PACKAGE_SYNC_LOCK:
             from p2pstorage_core.server.Header import Header
 
             header_data = host_socket.recv(StreamConfiguration.HEADER_SIZE)
