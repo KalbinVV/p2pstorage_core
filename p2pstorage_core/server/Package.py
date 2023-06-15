@@ -31,6 +31,7 @@ class PackageType(IntEnum):
     TRANSACTION_FINISHED = 17
     GET_FILE_OWNERS_BY_ID_REQUEST = 18
     FILE_OWNERS_RESPONSE = 19
+    MESSAGE = 20
 
 
 class Package:
@@ -400,6 +401,20 @@ class FileOwnersResponsePackage(Package):
 
     def get_reject_reason(self) -> str:
         return self.get_data()['reject_reason']
+
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
+
+
+class MessagePackage(Package):
+    def __init__(self, msg: str):
+        super().__init__({
+            'msg': msg
+        }, PackageType.MESSAGE)
+
+    def get_message(self) -> str:
+        return self.get_data()['msg']
 
     @classmethod
     def from_abstract(cls, package: Package) -> Self:
