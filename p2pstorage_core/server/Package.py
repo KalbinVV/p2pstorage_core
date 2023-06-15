@@ -1,6 +1,5 @@
 import logging
 import socket
-import threading
 from enum import IntEnum
 import pickle
 from typing import Any, Type, Self, Optional
@@ -30,6 +29,8 @@ class PackageType(IntEnum):
     FILE_TRANSACTION_END_REQUEST = 15
     NEW_HOST_CONNECTED = 16
     TRANSACTION_FINISHED = 17
+    GET_FILE_OWNERS_BY_ID_REQUEST = 18
+    FILE_OWNERS_RESPONSE = 19
 
 
 class Package:
@@ -361,6 +362,44 @@ class FileTransactionFinishedPackage(Package):
 
     def get_sender_addr(self) -> SocketAddress:
         return self.get_data()['sender_addr']
+
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
+
+
+class GetFileOwnersByIdRequestPackage(Package):
+    def __init__(self, file_id: int):
+        super().__init__({
+            'file_id': file_id
+        }, PackageType.GET_FILE_OWNERS_BY_ID_REQUEST)
+
+    def get_file_id(self) -> int:
+        return self.get_data()['file_id']
+
+    @classmethod
+    def from_abstract(cls, package: Package) -> Self:
+        return cls(**package.get_data())
+
+
+class FileOwnersResponsePackage(Package):
+    def __init__(self, response_approved: bool = True,
+                 owners: Optional[list[HostInfo]] = None,
+                 reject_reason: str = ''):
+        super().__init__({
+            'response_approved': response_approved,
+            'owners': owners,
+            'reject_reason': reject_reason
+        }, PackageType.FILE_OWNERS_RESPONSE)
+
+    def is_response_approved(self) -> bool:
+        return self.get_data()['response_approved']
+
+    def get_owners(self) -> list[HostInfo]:
+        return self.get_data()['owners']
+
+    def get_reject_reason(self) -> str:
+        return self.get_data()['reject_reason']
 
     @classmethod
     def from_abstract(cls, package: Package) -> Self:
