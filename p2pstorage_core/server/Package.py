@@ -356,13 +356,17 @@ class NewHostConnectedPackage(Package):
 
 
 class FileTransactionFinishedPackage(Package):
-    def __init__(self, sender_addr: SocketAddress):
+    def __init__(self, sender_addr: SocketAddress, file_name: str):
         super().__init__({
-            'sender_addr': sender_addr
+            'sender_addr': sender_addr,
+            'file_name': file_name
         }, PackageType.TRANSACTION_FINISHED)
 
     def get_sender_addr(self) -> SocketAddress:
         return self.get_data()['sender_addr']
+
+    def get_filename(self) -> str:
+        return self.get_data()['file_name']
 
     @classmethod
     def from_abstract(cls, package: Package) -> Self:
