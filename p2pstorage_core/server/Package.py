@@ -408,13 +408,17 @@ class FileOwnersResponsePackage(Package):
 
 
 class MessagePackage(Package):
-    def __init__(self, msg: str):
+    def __init__(self, msg: str, from_addr: SocketAddress):
         super().__init__({
-            'msg': msg
+            'msg': msg,
+            'from_addr': from_addr
         }, PackageType.MESSAGE)
 
     def get_message(self) -> str:
         return self.get_data()['msg']
+
+    def get_from(self) -> SocketAddress:
+        return self.get_data()['from_addr']
 
     @classmethod
     def from_abstract(cls, package: Package) -> Self:
