@@ -372,7 +372,7 @@ class GetFileOwnersByIdRequestPackage(Package):
     def __init__(self, file_id: int):
         super().__init__({
             'file_id': file_id
-        }, PackageType.GET_FILE_BY_ID_REQUEST)
+        }, PackageType.GET_FILE_OWNERS_BY_ID_REQUEST)
 
     def get_file_id(self) -> int:
         return self.get_data()['file_id']
